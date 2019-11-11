@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using Redbus.Events;
 
 namespace Redbus.Interfaces
@@ -15,6 +17,13 @@ namespace Redbus.Interfaces
         /// <param name="action">The Action to invoke when an event of this type is published</param>
         /// <returns>A <see cref="SubscriptionToken"/> to be used when calling <see cref="Unsubscribe"/></returns>
         SubscriptionToken Subscribe<TEventBase>(Action<TEventBase> action) where TEventBase : EventBase;
+        
+        /// <summary>
+        /// Subscribes to all event handlers in the specified type
+        /// </summary>
+        /// <param name="type">The type with our event handlers</param>
+        /// <returns>A list of <see cref="SubscriptionToken"/> to be used when calling <see cref="Unsubscribe"/></returns>
+        List<SubscriptionToken> SubscribeAll(Type type, object instance);
 
         /// <summary>
         /// Unsubscribe from the Event type related to the specified <see cref="SubscriptionToken"/>

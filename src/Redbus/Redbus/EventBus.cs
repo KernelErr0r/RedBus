@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 using Redbus.Configuration;
 using Redbus.Events;
@@ -13,6 +15,8 @@ namespace Redbus
     /// </summary>
     public class EventBus : IEventBus
     {
+        private const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+    
         private readonly IEventBusConfiguration _eventBusConfiguration;
         public EventBus(IEventBusConfiguration configuration = null)
         {
@@ -39,6 +43,60 @@ namespace Redbus
                 var token = new SubscriptionToken(typeof(TEventBase));
                 _subscriptions[typeof(TEventBase)].Add(new Subscription<TEventBase>(action, token));
                 return token;
+            }
+        }
+
+        /// <summary>
+        /// Subscribes to all event handlers in the specified type
+        /// </summary>
+        /// <param name="type">The type with our event handlers</param>
+        /// <returns>A list of <see cref="SubscriptionToken"/> to be used when calling <see cref="Unsubscribe"/></returns>
+        public List<SubscriptionToken> SubscribeAll(Type type, object instance)
+        {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
+            if (type.GetCustomAttribute<EventHandlerAttribute>() == null)
+                throw new ArgumentException(nameof(type));
+
+            lock (SubscriptionsLock)
+            {
+                var tokens = new List<SubscriptionToken>();
+
+                foreach (var method in type.GetMethods(flags))
+                {
+                    if (method.GetCustomAttribute<EventHandlerAttribute>() != null)
+                    {
+                        if (method.GetParameters().Length == 1)
+                        {
+                            var @event = method.GetParameters()[0];
+                            var eventType = @event.ParameterType;
+                        
+                            if (!_subscriptions.ContainsKey(eventType))
+                                _subscriptions.Add(eventType, new List<ISubscription>());
+
+                            var token = new SubscriptionToken(eventType);
+
+                            var subscriptionType = typeof(Subscription<>);
+                            var subscriptionGenericType = subscriptionType.MakeGenericType(new Type[] { eventType });
+
+                            var parameters = new [] { Expression.Parameter(eventType, @event.Name) };
+                            var @delegate = Expression.Lambda(Expression.Call(Expression.Constant(instance), method, parameters), parameters).Compile();
+
+                            var subscription = Activator.CreateInstance(subscriptionGenericType, new object[] { @delegate, token }) as ISubscription;
+                            
+                            _subscriptions[eventType].Add(subscription);
+
+                            tokens.Add(token);
+                        }
+                        else
+                        {
+                            throw new InvalidEventHandlerException(method);
+                        }
+                    }
+                }
+
+                return tokens;
             }
         }
 
