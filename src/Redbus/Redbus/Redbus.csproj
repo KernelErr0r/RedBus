@@ -7,11 +7,11 @@
     <AssemblyName>Redbus</AssemblyName>
     <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <Authors>mxjones</Authors>
+    <Authors>mxjones, KernelError</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Copyright>Copyright 2015-2018</Copyright>
+    <Copyright>Copyright 2015-2019</Copyright>
     <PackageTags>eventbus pubsub messagebus aggregator redbus messaging bus</PackageTags>
-    <RepositoryUrl>https://github.com/mxjones/RedBus</RepositoryUrl>
+    <RepositoryUrl>https://github.com/KernelErr0r/RedBus</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PostBuildEvent></PostBuildEvent>
     <Version>1.0.8</Version>
