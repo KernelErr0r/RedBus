@@ -8,6 +8,7 @@ using System.Threading;
 namespace Redbus.Tests
 {
     [TestClass]
+    [EventHandler]
     public class EventBusTests
     {
         private bool _methodHandlerHit;
@@ -20,6 +21,19 @@ namespace Redbus.Tests
             _actionHandlerHit = false;
         }
 
+        [TestMethod]
+        public void SubscribeAllAndPublishCustomEventMethodTest()
+        {
+            var eventBus = new EventBus();
+            var tokens = eventBus.SubscribeAll(GetType(), this);
+
+            Assert.AreEqual(1, tokens.Count);
+            Assert.IsFalse(_methodHandlerHit);
+            eventBus.Publish(new CustomTestEvent { Name = "Custom Event", Identifier = 1 });
+            Assert.IsTrue(_methodHandlerHit);
+        }
+        
+                
         [TestMethod]
         public void SubscribeAndPublishCustomEventMethodTest()
         {
@@ -177,7 +191,8 @@ namespace Redbus.Tests
             Assert.IsTrue(thirdSubscriberHit); // Third subscriber will be hit, because we didn't throw.
         }
 
-        private void CustomTestEventMethodHandler(CustomTestEvent customTestEvent)
+        [EventHandler]
+        public void CustomTestEventMethodHandler(CustomTestEvent customTestEvent)
         {
             Assert.AreEqual("Custom Event", customTestEvent.Name);
             Assert.AreEqual(1, customTestEvent.Identifier);
