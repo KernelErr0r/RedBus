@@ -31,7 +31,6 @@ namespace Redbus.Tests
             Assert.IsTrue(_methodHandlerHit);
         }
 
-
         [TestMethod]
         public void SubscribeAndPublishAsyncCustomEventMethodTest()
         {
@@ -184,11 +183,5 @@ namespace Redbus.Tests
             Assert.AreEqual(1, customTestEvent.Identifier);
             _methodHandlerHit = true;
         }
-    }
-
-    internal class CustomTestEvent : EventBase
-    {
-        public string Name { get; set; }
-        public int Identifier { get; set; }
     }
 }
