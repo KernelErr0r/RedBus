@@ -1,16 +1,6 @@
 # RedBus
 A simple in memory EventBus / MessageBus library in C# with no dependencies
 
-[![Build status](https://ci.appveyor.com/api/projects/status/aeoqsovbx5k7vfxg?svg=true)](https://ci.appveyor.com/project/mxjones/redbus)
-
-
-# Nuget
-```
-Install-Package Redbus 
-```
-
-[![NuGet](https://img.shields.io/nuget/v/Redbus.svg)](https://www.nuget.org/packages/Redbus/)
-
 # Supported Frameworks
 * .NET Framework 4.5
 * .NET Standard 2.0
